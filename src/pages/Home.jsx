@@ -61,7 +61,7 @@ function Home() {
 
             </p>
           </div>
-
+          
           <hr className="border-t-4 border-gray-300 my-6 w-3/4 mx-auto" />
 
           {/* Advisor's Message Section */}
@@ -183,7 +183,6 @@ function Home() {
             </a>
           </div>
         </div>
-
       </Container>
     </div>
   );
