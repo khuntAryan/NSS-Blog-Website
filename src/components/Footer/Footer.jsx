@@ -1,15 +1,16 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import Logo from '../Logo';
+import { Mail, MapPin } from "lucide-react";
 
 function Footer() {
   return (
     <section className="relative overflow-hidden bg-black text-gray-300 w-full min-h-min py-10 border-t-4 border-orange-500">
       <div className="relative z-10 mx-auto max-w-none w-full px-6 lg:px-12">
-        <div className="-m-6 flex flex-wrap">
+        <div className="-m-6 flex flex-wrap justify-between">
           
           {/* Left Side: Logo & Copyright */}
-          <div className="w-full p-6 md:w-1/2 lg:w-5/12">
+          <div className="w-full p-6 md:w-1/2 lg:w-1/3">
             <div className="flex flex-col justify-between h-full">
               <div className="mb-6 flex items-center">
                 <Logo width="120px" />
@@ -18,67 +19,46 @@ function Footer() {
             </div>
           </div>
 
-          {/* Company Section */}
-          <div className="w-full p-6 md:w-1/2 lg:w-2/12">
+          {/* NSS Section */}
+          <div className="w-full p-6 md:w-1/2 lg:w-1/3">
             <div className="h-full">
-              <h3 className="text-sm font-semibold uppercase text-orange-400 mb-5">Company</h3>
-              <ul>
-                <li className="mb-3">
-                  <Link className="hover:text-orange-500 transition" to="/">Features</Link>
-                </li>
-                <li className="mb-3">
-                  <Link className="hover:text-orange-500 transition" to="/">Pricing</Link>
-                </li>
-                <li className="mb-3">
-                  <Link className="hover:text-orange-500 transition" to="/">Affiliate Program</Link>
-                </li>
-                <li>
-                  <Link className="hover:text-orange-500 transition" to="/">Press Kit</Link>
-                </li>
-              </ul>
+              <h3 className="text-sm font-semibold uppercase text-orange-400 mb-5">National Service Scheme</h3>
+              <p className="text-gray-400 text-sm mb-4">
+                NSS promotes youth involvement in community service and nation-building.  
+                <strong> “NOT ME, BUT YOU” </strong> is its guiding motto, inspiring social responsibility.
+              </p>
+              <a href="https://www.srmist.edu.in/nss/" target="_blank" rel="noopener noreferrer" className="text-orange-500 hover:underline">
+                Learn More
+              </a>
             </div>
           </div>
 
-          {/* Support Section */}
-          <div className="w-full p-6 md:w-1/2 lg:w-2/12">
+          {/* NSS Contact Info */}
+          <div className="w-full p-6 md:w-1/2 lg:w-1/3">
             <div className="h-full">
-              <h3 className="text-sm font-semibold uppercase text-orange-400 mb-5">Support</h3>
-              <ul>
-                <li className="mb-3">
-                  <Link className="hover:text-orange-500 transition" to="/">Account</Link>
-                </li>
-                <li className="mb-3">
-                  <Link className="hover:text-orange-500 transition" to="/">Help</Link>
-                </li>
-                <li className="mb-3">
-                  <Link className="hover:text-orange-500 transition" to="/">Contact Us</Link>
-                </li>
-                <li>
-                  <Link className="hover:text-orange-500 transition" to="/">Customer Support</Link>
-                </li>
-              </ul>
-            </div>
-          </div>
+              <h3 className="text-sm font-semibold uppercase text-orange-400 mb-5">Contact Us</h3>
+              <p className="flex items-center mb-2 text-gray-400 text-sm">
+                <MapPin className="w-5 h-5 mr-2 text-orange-500" />
+                NSS Cell, Geopolymer Concrete Building, Besides Fab Lab,
+              </p>
+              <p className="ml-7 text-gray-400 text-sm">SRM Institute of Science and Technology,</p>
+              <p className="ml-7 text-gray-400 text-sm">Kattankulathur, Chengalpattu District – 603 203</p>
 
-          {/* Legal Section */}
-          <div className="w-full p-6 md:w-1/2 lg:w-3/12">
-            <div className="h-full">
-              <h3 className="text-sm font-semibold uppercase text-orange-400 mb-5">Legals</h3>
-              <ul>
-                <li className="mb-3">
-                  <Link className="hover:text-orange-500 transition" to="/">Terms & Conditions</Link>
-                </li>
-                <li className="mb-3">
-                  <Link className="hover:text-orange-500 transition" to="/">Privacy Policy</Link>
-                </li>
-                <li>
-                  <Link className="hover:text-orange-500 transition" to="/">Licensing</Link>
-                </li>
-              </ul>
+              <p className="flex items-center mt-4 text-gray-400 text-sm">
+                <Mail className="w-5 h-5 mr-2 text-orange-500" />
+                <a href="mailto:nsscell@srmist.edu.in" className="text-orange-500 hover:underline">
+                  nsscell@srmist.edu.in
+                </a>
+              </p>
             </div>
           </div>
 
         </div>
+      </div>
+
+      {/* Created by Aryan Khunt */}
+      <div className="absolute bottom-2 right-4 text-gray-600 text-xs">
+        Created by Aryan Khunt
       </div>
     </section>
   );
