@@ -1,7 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Container, PostForm } from '../components';
-import authService from '../appwrite/auth'; // Ensure correct path
+import authService from '../appwrite/auth'; 
 import { useNavigate } from 'react-router-dom';
+import { Link } from "react-router-dom";
+import { AlertCircle } from "lucide-react";
 
 const ADMIN_EMAIL = "aryan@gmail.com"; 
 
@@ -11,10 +13,10 @@ function AddPost() {
     const navigate = useNavigate();
 
     useEffect(() => {
-      authService.getCurrentUser()
+        authService.getCurrentUser()
             .then(user => {
-                if (user) {
-                    setUserEmail(user.email);
+                if (user && user.email) {
+                    setUserEmail(user.email.toLowerCase());
                 } else {
                     navigate('/'); 
                 }
@@ -27,10 +29,20 @@ function AddPost() {
         return <div className="text-center text-white py-8">Loading...</div>;
     }
 
-    if (userEmail !== ADMIN_EMAIL) {
+    if (userEmail !== ADMIN_EMAIL.toLowerCase()) {
         return (
-            <div className="text-center text-red-500 py-8 font-bold">
-                Only admin can create a post.
+            <div className="mt-8 flex flex-col items-center justify-center max-w-md mx-auto bg-gray-100 rounded-xl p-6 shadow-lg">
+                <AlertCircle className="text-red-500 w-10 h-10 mb-3" aria-hidden="true" />
+                <h2 className="text-xl font-bold text-gray-800">Access Denied!</h2>
+                <p className="text-gray-600 mt-2 text-center text-sm">
+                    You don’t have permission to create a post. This action is restricted to admins only.
+                </p>
+                <Link
+                    to="/"
+                    className="mt-4 px-5 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition"
+                >
+                    Go Back Home
+                </Link>
             </div>
         );
     }

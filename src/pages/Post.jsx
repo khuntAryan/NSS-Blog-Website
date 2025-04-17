@@ -1,9 +1,11 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import appwriteService from "../appwrite/config";
 import { Button, Container } from "../components";
 import parse from "html-react-parser";
 import { useSelector } from "react-redux";
+import Terminal from "../components/Terminal";
+import { motion } from "framer-motion";
 
 export default function Post() {
     const [post, setPost] = useState(null);
@@ -11,7 +13,6 @@ export default function Post() {
     const navigate = useNavigate();
 
     const userData = useSelector((state) => state.auth.userData);
-
     const isAuthor = post && userData ? post.userId === userData.$id : false;
 
     useEffect(() => {
@@ -32,36 +33,68 @@ export default function Post() {
         });
     };
 
-    return post ? (
-        <div className="py-8 bg-gray-900 text-white flex justify-center">
-            <Container>
-                <div className="w-full flex flex-col items-center mb-4 relative border rounded-xl p-4 bg-gray-800 shadow-lg">
-                    <img
-                        src={appwriteService.getFilePreview(post.featuredImage)}
-                        alt={post.title}
-                        className="rounded-xl max-w-full"
-                    />
+    if (!post) {
+        return (
+            <div className="text-center py-20 text-white">
+                <p className="text-xl">Loading post...</p>
+            </div>
+        );
+    }
 
+    // Function to split and animate parsed HTML content
+    const animateParsedContent = (html) => {
+        const lines = html.split(/<br\s*\/?>/i); // splitting by <br> tags
+        return lines.map((line, index) => (
+            <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.5 + index * 0.2 }}
+            >
+                {parse(line)}
+            </motion.div>
+        ));
+    };
+
+    return (
+        <div className="py-10 bg-gray-900 min-h-screen flex justify-center text-white">
+            <Container>
+                <div className="max-w-4xl mx-auto rounded-xl bg-black p-6 text-sm font-mono leading-relaxed shadow-2xl border border-gray-700 relative">
+
+                    {/* Terminal buttons top-left corner */}
+                    <div className="absolute top-4 left-4 flex space-x-2">
+                        <span className="w-3 h-3 bg-red-500 rounded-full" />
+                        <span className="w-3 h-3 bg-yellow-500 rounded-full" />
+                        <span className="w-3 h-3 bg-green-500 rounded-full" />
+                    </div>
+
+                    {/* Edit/Delete Buttons top-right */}
                     {isAuthor && (
-                        <div className="absolute right-6 top-6">
+                        <div className="absolute top-4 right-4 flex gap-2">
                             <Link to={`/edit-post/${post.$id}`}>
-                                <Button bgColor="bg-green-500" className="mr-3">
-                                    Edit
-                                </Button>
+                                <Button bgColor="bg-green-600 hover:bg-green-700">Edit</Button>
                             </Link>
-                            <Button bgColor="bg-red-500" onClick={deletePost}>
+                            <Button bgColor="bg-red-600 hover:bg-red-700" onClick={deletePost}>
                                 Delete
                             </Button>
                         </div>
                     )}
-                </div>
-                <div className="w-full text-center mb-6">
-                    <h1 className="text-3xl font-bold text-orange-500">{post.title}</h1>
-                </div>
-                <div className="w-full max-w-4xl mx-auto bg-gray-800 p-6 rounded-lg shadow-lg text-center">
-                    <div className="text-white text-center">{parse(post.content)}</div>
+
+                    {/* Terminal Content with Animation */}
+                    <div className="mt-10 space-y-4">
+                        <Terminal
+                            lines={[
+                                `Post Title: ${post.title}`,
+                            ]}
+                        />
+
+                        {/* Animated Post Content */}
+                        <div className="pt-4 text-white space-y-2">
+                            {animateParsedContent(post.content)}
+                        </div>
+                    </div>
                 </div>
             </Container>
         </div>
-    ) : null;
+    );
 }
