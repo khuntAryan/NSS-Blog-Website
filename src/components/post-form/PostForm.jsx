@@ -21,24 +21,15 @@ export default function PostForm({ post }) {
 
     const submit = async (data) => {
         try {
-            let file = data.image?.[0] ? await appwriteService.uploadFile(data.image[0]) : null;
             if (post) {
-                if (file && post.featuredImage) {
-                    await appwriteService.deleteFile(post.featuredImage);
-                }
-
                 const dbPost = await appwriteService.updatePost(post.$id, {
                     ...data,
-                    featuredImage: file ? file.$id : post.featuredImage,
                 });
 
                 if (dbPost) navigate(`/post/${dbPost.$id}`);
             } else {
-                if (!file) throw new Error("File upload failed");
-
                 const dbPost = await appwriteService.createPost({
                     ...data,
-                    featuredImage: file.$id,
                     userId: userData?.$id,
                 });
 
@@ -67,7 +58,7 @@ export default function PostForm({ post }) {
 
     return (
         <form onSubmit={handleSubmit(submit)} className="flex flex-wrap">
-            <div className="w-2/3 px-2">
+            <div className="w-full px-2">
                 <label htmlFor="title" className="block font-medium">Title:</label>
                 <Input
                     id="title"
@@ -96,30 +87,8 @@ export default function PostForm({ post }) {
                     control={control}
                     defaultValue={getValues("content")}
                 />
-            </div>
 
-            <div className="w-1/3 px-2">
-                <label htmlFor="image" className="block font-medium">Featured Image:</label>
-                <Input
-                    id="image"
-                    name="image"
-                    type="file"
-                    className="mb-4"
-                    accept="image/png, image/jpg, image/jpeg, image/gif"
-                    {...register("image", { required: !post })}
-                />
-
-                {post?.featuredImage && (
-                    <div className="w-full mb-4">
-                        <img
-                            src={appwriteService.getFilePreview(post.featuredImage)}
-                            alt={post.title}
-                            className="rounded-lg"
-                        />
-                    </div>
-                )}
-
-                <label htmlFor="status" className="block font-medium">Status:</label>
+                <label htmlFor="status" className="block font-medium mt-4">Status:</label>
                 <Select
                     id="status"
                     name="status"

@@ -16,6 +16,9 @@ import Post from "./pages/Post";
 
 import AllPosts from "./pages/AllPosts";
 
+import PastEvent from './pages/PastEvent'; // 👈 at the top
+
+
 const router = createBrowserRouter([
   {
     path: "/",
@@ -67,6 +70,10 @@ const router = createBrowserRouter([
             path: "/post/:slug",
             element: <Post />,
         },
+        {
+            path: "/pastevent",
+            element: <PastEvent/>
+        }
     ],
 },
 ])
