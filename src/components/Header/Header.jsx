@@ -4,6 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Menu, X } from 'lucide-react';
 import { useSelector } from 'react-redux';
 
+
 function Header() {
   const authStatus = useSelector((state) => state.auth.status);
   const navigate = useNavigate();
@@ -15,9 +16,8 @@ function Header() {
     { name: 'Signup', slug: '/signup', active: !authStatus },
     { name: 'All Posts', slug: '/all-posts', active: true },
     { name: 'Add Post', slug: '/add-post', active: authStatus },
-    { name: 'Past Event', slug: '/pastevent', active: true }, // ✅ added
+  
   ];
-
   return (
     <header className="backdrop-blur-md bg-black/40 text-white sticky top-0 z-50 shadow-lg border-b border-white/10">
       <nav className="flex items-center justify-between p-4 max-w-7xl mx-auto">

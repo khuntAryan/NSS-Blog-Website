@@ -1,66 +1,151 @@
-"use client";
+import { useEffect, useState } from "react";
+import { Client, Databases, ID } from "appwrite";
+import authService from "../appwrite/auth";
+import { BentoGrid, BentoGridItem } from "../components/ui/bento-grid";
+import {
+  IconArrowWaveRightUp,
+  IconClipboardCopy,
+  IconSignature,
+} from "@tabler/icons-react";
 
-import {StickyScroll} from "./ui/sticky-scroll-reveal";
+// Setup Appwrite
+const client = new Client()
+  .setEndpoint("https://cloud.appwrite.io/v1")
+  .setProject("676707eb003094b1b6ec");
 
-const content = [
-  {
-    title: "Collaborative Editing",
-    description:
-      "Work together in real time with your team, clients, and stakeholders. Collaborate on documents, share ideas, and make decisions quickly. With our platform, you can streamline your workflow and increase productivity.",
-    content: (
-      <div className="flex h-full w-full items-center justify-center bg-[linear-gradient(to_bottom_right,var(--cyan-500),var(--emerald-500))] text-white">
-        Collaborative Editing
-      </div>
-    ),
-  },
-  {
-    title: "Real time changes",
-    description:
-      "See changes as they happen. With our platform, you can track every modification in real time. No more confusion about the latest version of your project. Say goodbye to the chaos of version control and embrace the simplicity of real-time updates.",
-    content: (
-      <div className="flex h-full w-full items-center justify-center text-white">
-        <img
-          src="/linear.webp"
-          width={300}
-          height={300}
-          className="h-full w-full object-cover"
-          alt="linear board demo"
-        />
-      </div>
-    ),
-  },
-  {
-    title: "World Blood Donor Day",
-    description:
-      "Every drop counts. Join us in celebrating World Blood Donor Day and help save lives.",
-    content: (
-      <div className="flex h-full w-full items-center justify-center text-white">
-        <img
-          src="https://media.istockphoto.com/id/1414901355/vector/world-blood-donor-day-vector-background.jpg?s=612x612&w=0&k=20&c=rOcujEhfwrptwsq1YZxQv6mibq0Woq0T5Q4VDWo7C5A="
-          alt="World Blood Donor Day"
-          className="h-full w-full object-cover rounded-xl shadow-lg"
-        />
-      </div>
-    ),
-  },
-  {
-    title: "Version control",
-    description:
-      "Experience real-time updates and never stress about version control again. Our platform ensures that you're always working on the most recent version of your project, eliminating the need for constant manual updates. Stay in the loop, keep your team aligned, and maintain the flow of your work without any interruptions.",
-    content: (
-      <div className="flex h-full w-full items-center justify-center bg-[linear-gradient(to_bottom_right,var(--orange-500),var(--yellow-500))] text-white">
-        Version control
-      </div>
-    ),
-  },
-];
+const databases = new Databases(client);
+const databaseId = "67670848003983e9d87f";
+const collectionId = "680221ed00055dd00c7f";
 
-const Event = () => {
-  return (
-    <div className="w-full py-10 px-4">
-      <StickyScroll content={content} />
-    </div>
-  );
+const Skeleton = () => (
+  <div className="flex flex-1 w-full h-full min-h-[6rem] rounded-xl bg-gradient-to-br from-neutral-200 dark:from-neutral-900 dark:to-neutral-800 to-neutral-100"></div>
+);
+
+export default function Events() {
+  const [form, setForm] = useState({ title: "", content: "" });
+  const [events, setEvents] = useState([]);
+  const [user, setUser] = useState(null);
+  const [showModal, setShowModal] = useState(false);
+
+  const isAryan = user?.email === "aryan@gmail.com";
+
+  useEffect(() => {
+    authService.getCurrentUser().then(setUser);
+    fetchEvents();
+  }, []);
+
+  const fetchEvents = async () => {
+    try {
+      const res = await databases.listDocuments(databaseId, collectionId);
+      setEvents(res.documents.reverse());
+    } catch (err) {
+      console.error("Error fetching events:", err);
+    }
+  };
+
+ const handleSubmit = async (e) => {
+  e.preventDefault();
+  try {
+    await databases.createDocument(
+      databaseId,
+      collectionId,
+      ID.unique(),
+      {
+        title: form.title,
+        content: form.content,
+      },
+      [
+        `read("users")`,    // Readable by any logged-in user
+        `write("user:${user.$id}")`  // Writable only by the creator
+      ]
+    );
+    setForm({ title: "", content: "" });
+    setShowModal(false);
+    fetchEvents();
+  } catch (err) {
+    console.error("Error submitting event:", err);
+  }
 };
 
-export default Event;
+  return (
+    <div className="max-w-5xl mx-auto p-4">
+      {isAryan && (
+        <div className="mb-6">
+          <button
+            onClick={() => setShowModal(true)}
+            className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+          >
+            + Add Event
+          </button>
+        </div>
+      )}
+
+      <BentoGrid className="max-w-4xl mx-auto">
+        {events.map((event, i) => (
+          <BentoGridItem
+            key={event.$id}
+            title={event.title}
+            description={event.content}
+            header={<Skeleton />}
+            icon={
+              i % 3 === 0 ? (
+                <IconArrowWaveRightUp className="h-4 w-4 text-neutral-500" />
+              ) : i % 3 === 1 ? (
+                <IconClipboardCopy className="h-4 w-4 text-neutral-500" />
+              ) : (
+                <IconSignature className="h-4 w-4 text-neutral-500" />
+              )
+            }
+            className={i % 7 === 3 || i % 7 === 6 ? "md:col-span-2" : ""}
+          />
+        ))}
+      </BentoGrid>
+
+      {/* Modal for Aryan */}
+      {showModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+          <div className="bg-white dark:bg-zinc-900 p-6 rounded-lg w-full max-w-md shadow-lg">
+            <h2 className="text-xl font-semibold mb-4">Add New Event</h2>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <input
+                type="text"
+                placeholder="Title"
+                value={form.title}
+                onChange={(e) =>
+                  setForm({ ...form, title: e.target.value })
+                }
+                className="w-full p-2 border rounded"
+                required
+              />
+              <textarea
+                placeholder="Content"
+                value={form.content}
+                onChange={(e) =>
+                  setForm({ ...form, content: e.target.value })
+                }
+                className="w-full p-2 border rounded"
+                rows={4}
+                required
+              />
+              <div className="flex justify-end space-x-2">
+                <button
+                  type="button"
+                  onClick={() => setShowModal(false)}
+                  className="px-4 py-2 rounded border"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+                >
+                  Submit
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
