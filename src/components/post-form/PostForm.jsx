@@ -1,10 +1,16 @@
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import { useForm } from "react-hook-form";
 import { Button, Input, RTE, Select } from "..";
 import appwriteService from "../../appwrite/config";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
+
+// Cloudinary config for image upload
+const cloudinaryConfig = {
+    cloudName: 'dhk96ss3x',
+    uploadPreset: 'events_upload'
+};
 
 export default function PostForm({ post }) {
     const { register, handleSubmit, watch, setValue, control, getValues } = useForm({
@@ -13,23 +19,59 @@ export default function PostForm({ post }) {
             slug: post?.$id || "",
             content: post?.content || "",
             status: post?.status || "active",
+            featuredImage: post?.featuredImage || "", // Add featuredImage to form data
         },
     });
 
+    const [imageUrl, setImageUrl] = useState(post?.featuredImage || null);
     const navigate = useNavigate();
     const userData = useSelector((state) => state.auth?.userData);
+
+    const uploadImageToCloudinary = async (file) => {
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('upload_preset', cloudinaryConfig.uploadPreset);
+
+        try {
+            const response = await fetch(
+                `https://api.cloudinary.com/v1_1/${cloudinaryConfig.cloudName}/image/upload`,
+                {
+                    method: 'POST',
+                    body: formData
+                }
+            );
+            const data = await response.json();
+            return data.secure_url;
+        } catch (error) {
+            console.error('Error uploading image:', error);
+            return null;
+        }
+    };
+
+    const handleImageUpload = async (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const uploadedImageUrl = await uploadImageToCloudinary(file);
+            if (uploadedImageUrl) {
+                setImageUrl(uploadedImageUrl);
+                setValue("featuredImage", uploadedImageUrl, { shouldValidate: true });
+            }
+        }
+    };
 
     const submit = async (data) => {
         try {
             if (post) {
                 const dbPost = await appwriteService.updatePost(post.$id, {
                     ...data,
+                    featuredImage: imageUrl, // Include the image URL in the update
                 });
                 if (dbPost) navigate(`/post/${dbPost.$id}`);
             } else {
                 const dbPost = await appwriteService.createPost({
                     ...data,
                     userId: userData?.$id,
+                    featuredImage: imageUrl, // Include the image URL in the creation
                 });
                 if (dbPost) navigate(`/post/${dbPost.$id}`);
             }
@@ -79,7 +121,7 @@ export default function PostForm({ post }) {
                         id="title"
                         name="title"
                         placeholder="Enter title"
-                        className="bg-gray-700 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                        className="bg-gray-700 text-black border border-gray-600 focus:outline-none focus:ring-2 focus:ring-orange-500"
                         {...register("title", { required: "Title is required" })}
                     />
                 </div>
@@ -92,7 +134,7 @@ export default function PostForm({ post }) {
                         id="slug"
                         name="slug"
                         placeholder="Generated slug"
-                        className="bg-gray-700 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                        className="bg-gray-700 text-black border border-gray-600 focus:outline-none focus:ring-2 focus:ring-orange-500"
                         {...register("slug", { required: "Slug is required" })}
                         onInput={(e) =>
                             setValue("slug", slugTransform(e.currentTarget.value), { shouldValidate: true })
@@ -120,9 +162,30 @@ export default function PostForm({ post }) {
                         id="status"
                         name="status"
                         options={["active", "inactive"]}
-                        className="bg-gray-700 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                        className="bg-gray-700 text-black border border-gray-600 focus:outline-none focus:ring-2 focus:ring-orange-500"
                         {...register("status", { required: "Status is required" })}
                     />
+                </div>
+
+                <div>
+                    <label htmlFor="featuredImage" className="block text-sm font-semibold text-gray-300 mb-1">
+                        Featured Image
+                    </label>
+                    <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleImageUpload}
+                        className="bg-gray-700 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                    />
+                    {imageUrl && (
+                        <div className="mt-4">
+                            <img
+                                src={imageUrl}
+                                alt="Featured"
+                                className="max-w-full h-auto rounded-lg"
+                            />
+                        </div>
+                    )}
                 </div>
 
                 <Button

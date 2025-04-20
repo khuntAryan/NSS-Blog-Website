@@ -88,6 +88,22 @@ export default function Post() {
                             lines={[`Post Title: ${post.title}`]}
                         />
 
+                        {/* Image Display */}
+                        {post.featuredImage && (
+                            <motion.div
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                transition={{ delay: 1 }}
+                                className="w-full max-w-md mx-auto mt-6"
+                            >
+                                <img
+                                    src={post.featuredImage}
+                                    alt="Featured"
+                                    className="rounded-lg shadow-lg w-full h-auto"
+                                />
+                            </motion.div>
+                        )}
+
                         {/* Animated Post Content */}
                         <div className="pt-6 text-white space-y-4 text-[15px]">
                             {animateParsedContent(post.content)}

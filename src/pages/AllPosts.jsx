@@ -10,7 +10,11 @@ function AllPosts() {
   useEffect(() => {
     appwriteService.getPosts([]).then((posts) => {
       if (posts) {
-        setPosts(posts.documents);
+        // Sort posts by creation date (newest first)
+        const sortedPosts = [...posts.documents].sort((a, b) => 
+          new Date(b.$createdAt) - new Date(a.$createdAt)
+        );
+        setPosts(sortedPosts);
       }
       setLoading(false);
     });
@@ -35,10 +39,10 @@ function AllPosts() {
 
       {/* Watermark Logo */}
       <div className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none">
-  <div className="scale-[3] opacity-10">
-    <Logo className="w-auto h-auto" />
-  </div>
-</div>
+        <div className="scale-[3] opacity-10">
+          <Logo className="w-auto h-auto" />
+        </div>
+      </div>
 
       {/* Main Content */}
       <div className="relative z-20 py-20 px-4">
@@ -53,7 +57,7 @@ function AllPosts() {
           ) : posts.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
               {posts.map((post) => (
-                <div key={post.$id}>
+                <div key={post.$id} className="transition-all hover:scale-105 duration-300">
                   <PostCard {...post} />
                 </div>
               ))}
