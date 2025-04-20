@@ -8,7 +8,6 @@ import {
   IconSignature,
 } from "@tabler/icons-react";
 
-// Setup Appwrite
 const client = new Client()
   .setEndpoint("https://cloud.appwrite.io/v1")
   .setProject("676707eb003094b1b6ec");
@@ -195,25 +194,11 @@ export default function Events() {
         </div>
       )}
 
-      {/* Event Detail Popup - Fixed to viewport center */}
+      {/* Event Detail Popup - Viewport Centered */}
       {selectedEvent && (
-        <div 
-          className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 p-4"
-          onClick={() => setSelectedEvent(null)}
-          style={{
-            position: 'fixed',
-            top: '50%',
-            left: '50%',
-            transform: 'translate(-50%, -50%)',
-            width: '100vw',
-            height: '100vh',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center'
-          }}
-        >
+        <div className="fixed inset-0 bg-black bg-opacity-80 z-50 flex items-center justify-center p-4 overflow-y-auto">
           <div 
-            className="bg-white dark:bg-neutral-900 p-6 rounded-xl w-full max-w-md shadow-xl border border-neutral-200 dark:border-neutral-800"
+            className="bg-white dark:bg-neutral-900 p-6 rounded-xl w-full max-w-md shadow-xl border border-neutral-200 dark:border-neutral-800 my-auto"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex justify-between items-start mb-4">
@@ -254,7 +239,7 @@ export default function Events() {
 
       {/* Add Event Modal */}
       {showModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
           <div className="bg-white dark:bg-zinc-900 p-6 rounded-lg w-full max-w-md shadow-lg border border-neutral-200 dark:border-neutral-800">
             <h2 className="text-xl font-semibold mb-4">Add New Event</h2>
             <form onSubmit={handleSubmit} className="space-y-4">
