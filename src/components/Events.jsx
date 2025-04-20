@@ -17,10 +17,9 @@ const databases = new Databases(client);
 const databaseId = "67670848003983e9d87f";
 const collectionId = "680221ed00055dd00c7f";
 
-// Cloudinary configuration
 const cloudinaryConfig = {
-  cloudName: "dhk96ss3x",
-  uploadPreset: "events_upload",
+  cloudName: 'dhk96ss3x',
+  uploadPreset: 'events_upload'
 };
 
 const Skeleton = () => (
@@ -28,18 +27,19 @@ const Skeleton = () => (
 );
 
 export default function Events() {
-  const [form, setForm] = useState({
-    title: "",
+  const [form, setForm] = useState({ 
+    title: "", 
     content: "",
+    Date: "",
     image: null,
-    imagePreview: "",
+    imagePreview: "" 
   });
   const [events, setEvents] = useState([]);
   const [user, setUser] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
-  const [showAll, setShowAll] = useState(false); // New state for toggle
-  const [selectedEvent, setSelectedEvent] = useState(null); // For the popup
+  const [showAll, setShowAll] = useState(false);
+  const [selectedEvent, setSelectedEvent] = useState(null);
 
   const isAryan = user?.email === "aryan@gmail.com";
 
@@ -61,31 +61,31 @@ export default function Events() {
     const file = e.target.files[0];
     if (file) {
       const previewUrl = URL.createObjectURL(file);
-      setForm((prev) => ({
-        ...prev,
-        image: file,
-        imagePreview: previewUrl,
+      setForm(prev => ({ 
+        ...prev, 
+        image: file, 
+        imagePreview: previewUrl 
       }));
     }
   };
 
   const uploadImageToCloudinary = async (file) => {
     const formData = new FormData();
-    formData.append("file", file);
-    formData.append("upload_preset", cloudinaryConfig.uploadPreset);
+    formData.append('file', file);
+    formData.append('upload_preset', cloudinaryConfig.uploadPreset);
 
     try {
       const response = await fetch(
         `https://api.cloudinary.com/v1_1/${cloudinaryConfig.cloudName}/image/upload`,
         {
-          method: "POST",
-          body: formData,
+          method: 'POST',
+          body: formData
         }
       );
       const data = await response.json();
       return data.secure_url;
     } catch (error) {
-      console.error("Error uploading image:", error);
+      console.error('Error uploading image:', error);
       return null;
     }
   };
@@ -98,6 +98,7 @@ export default function Events() {
       const documentData = {
         title: form.title,
         content: form.content,
+        Date: form.Date
       };
 
       if (form.image) {
@@ -115,21 +116,22 @@ export default function Events() {
         [`read("users")`, `write("user:${user.$id}")`]
       );
 
-      setForm({ title: "", content: "", image: null, imagePreview: "" });
+      setForm({ 
+        title: "", 
+        content: "",
+        Date: "",
+        image: null, 
+        imagePreview: "" 
+      });
       setShowModal(false);
       fetchEvents();
     } catch (err) {
-      console.error("Full error:", {
-        message: err.message,
-        code: err.code,
-        response: err.response,
-      });
+      console.error("Full error:", err);
     } finally {
       setIsUploading(false);
     }
   };
 
-  // Determine which events to display based on showAll state
   const displayedEvents = showAll ? events : events.slice(0, 8);
 
   return (
@@ -138,7 +140,7 @@ export default function Events() {
         <div className="mb-6">
           <button
             onClick={() => setShowModal(true)}
-            className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+            className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition-colors"
           >
             + Add Event
           </button>
@@ -149,19 +151,23 @@ export default function Events() {
         {displayedEvents.map((event, i) => (
           <BentoGridItem
             key={event.$id}
-            title={<div className="line-clamp-1 text-ellipsis overflow-hidden">{event.title}</div>}
-            description={null} // Remove description from initial view
+            title={<div className="line-clamp-1 text-ellipsis overflow-hidden px-2 font-medium">{event.title}</div>}
+            description={null}
             header={
-              event.ImageUrl ? (
-                <img
-                  src={event.ImageUrl}
-                  alt={event.title}
-                  className="w-full h-full object-cover rounded-xl min-h-[10rem] cursor-pointer"
-                  onClick={() => setSelectedEvent(event)}
-                />
-              ) : (
-                <Skeleton />
-              )
+              <div 
+                onClick={() => setSelectedEvent(event)} 
+                className="cursor-pointer h-full overflow-hidden rounded-t-xl"
+              >
+                {event.ImageUrl ? (
+                  <img
+                    src={event.ImageUrl}
+                    alt={event.title}
+                    className="w-full h-full object-cover min-h-[10rem] hover:scale-105 transition-transform duration-300"
+                  />
+                ) : (
+                  <Skeleton />
+                )}
+              </div>
             }
             icon={
               i % 3 === 0 ? (
@@ -172,17 +178,16 @@ export default function Events() {
                 <IconSignature className="h-4 w-4 text-neutral-500" />
               )
             }
-            className={`${i % 7 === 3 || i % 7 === 6 ? "md:col-span-2" : ""} cursor-pointer`}
+            className={`${i % 7 === 3 || i % 7 === 6 ? "md:col-span-2" : ""} cursor-pointer bg-white dark:bg-neutral-900 rounded-xl shadow-sm hover:shadow-md transition-shadow border border-neutral-100 dark:border-neutral-800`}
             onClick={() => setSelectedEvent(event)}
           />
         ))}
       </BentoGrid>
 
-      {/* Show More/Show Less button - only show if there are more than 8 events */}
       {events.length > 8 && (
         <div className="flex justify-center mt-6">
           <button
-            onClick={() => setShowAll(!showAll)}
+            onClick={() => setShowAll(prev => !prev)}
             className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-6 py-2 rounded-full shadow-md hover:scale-105 transition-transform"
           >
             {showAll ? "Show Less" : "Show More"}
@@ -190,15 +195,34 @@ export default function Events() {
         </div>
       )}
 
-      {/* Event Detail Modal */}
+      {/* Event Detail Popup - Fixed to viewport center */}
       {selectedEvent && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 p-4">
-          <div className="bg-white dark:bg-zinc-900 p-6 rounded-lg w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-lg">
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 p-4"
+          onClick={() => setSelectedEvent(null)}
+          style={{
+            position: 'fixed',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            width: '100vw',
+            height: '100vh',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}
+        >
+          <div 
+            className="bg-white dark:bg-neutral-900 p-6 rounded-xl w-full max-w-md shadow-xl border border-neutral-200 dark:border-neutral-800"
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="flex justify-between items-start mb-4">
-              <h2 className="text-2xl font-bold">{selectedEvent.title}</h2>
+              <div>
+                <h2 className="text-2xl font-bold text-neutral-900 dark:text-white">{selectedEvent.title}</h2>
+              </div>
               <button
                 onClick={() => setSelectedEvent(null)}
-                className="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
+                className="text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300 p-1"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -210,12 +234,19 @@ export default function Events() {
               <img
                 src={selectedEvent.ImageUrl}
                 alt={selectedEvent.title}
-                className="w-full h-64 object-cover rounded-lg mb-4"
+                className="w-full h-48 object-cover rounded-lg mb-4"
               />
             )}
             
-            <div className="prose dark:prose-invert max-w-none">
-              {selectedEvent.content}
+            <div className="text-neutral-700 dark:text-neutral-300 space-y-4">
+              <p className="text-sm">{selectedEvent.content}</p>
+              
+              <div className="border-t border-neutral-200 dark:border-neutral-800 pt-4">
+                <div className="text-sm">
+                  <span className="text-neutral-500 dark:text-neutral-400 block">Date</span>
+                  <p className="font-medium">{selectedEvent.Date || "Not specified"}</p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -223,28 +254,47 @@ export default function Events() {
 
       {/* Add Event Modal */}
       {showModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-          <div className="bg-white dark:bg-zinc-900 p-6 rounded-lg w-full max-w-md shadow-lg">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white dark:bg-zinc-900 p-6 rounded-lg w-full max-w-md shadow-lg border border-neutral-200 dark:border-neutral-800">
             <h2 className="text-xl font-semibold mb-4">Add New Event</h2>
             <form onSubmit={handleSubmit} className="space-y-4">
-              <input
-                type="text"
-                placeholder="Title"
-                value={form.title}
-                onChange={(e) => setForm({ ...form, title: e.target.value })}
-                className="w-full p-2 border rounded"
-                required
-              />
-              <textarea
-                placeholder="Content"
-                value={form.content}
-                onChange={(e) => setForm({ ...form, content: e.target.value })}
-                className="w-full p-2 border rounded"
-                rows={4}
-                required
-              />
               <div>
-                <label className="block mb-2 text-sm font-medium">
+                <label className="block mb-1 text-sm font-medium">Title</label>
+                <input
+                  type="text"
+                  placeholder="Event title"
+                  value={form.title}
+                  onChange={(e) => setForm({ ...form, title: e.target.value })}
+                  className="w-full p-2 border rounded"
+                  required
+                />
+              </div>
+              
+              <div>
+                <label className="block mb-1 text-sm font-medium">Content</label>
+                <textarea
+                  placeholder="Event description"
+                  value={form.content}
+                  onChange={(e) => setForm({ ...form, content: e.target.value })}
+                  className="w-full p-2 border rounded"
+                  rows={4}
+                  required
+                />
+              </div>
+              
+              <div>
+                <label className="block mb-1 text-sm font-medium">Date</label>
+                <input
+                  type="text"
+                  placeholder="Event date"
+                  value={form.Date}
+                  onChange={(e) => setForm({ ...form, Date: e.target.value })}
+                  className="w-full p-2 border rounded"
+                />
+              </div>
+              
+              <div>
+                <label className="block mb-1 text-sm font-medium">
                   Event Image (Optional)
                 </label>
                 <input
@@ -263,17 +313,18 @@ export default function Events() {
                   </div>
                 )}
               </div>
-              <div className="flex justify-end space-x-2">
+              
+              <div className="flex justify-end space-x-2 pt-2">
                 <button
                   type="button"
                   onClick={() => setShowModal(false)}
-                  className="px-4 py-2 rounded border"
+                  className="px-4 py-2 rounded border hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:opacity-50"
+                  className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:opacity-50 transition-colors"
                   disabled={isUploading}
                 >
                   {isUploading ? "Uploading..." : "Submit"}
