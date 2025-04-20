@@ -26,12 +26,12 @@ const Skeleton = () => (
 );
 
 export default function Events() {
-  const [form, setForm] = useState({ 
-    title: "", 
+  const [form, setForm] = useState({
+    title: "",
     content: "",
     Date: "",
     image: null,
-    imagePreview: "" 
+    imagePreview: ""
   });
   const [events, setEvents] = useState([]);
   const [user, setUser] = useState(null);
@@ -60,10 +60,10 @@ export default function Events() {
     const file = e.target.files[0];
     if (file) {
       const previewUrl = URL.createObjectURL(file);
-      setForm(prev => ({ 
-        ...prev, 
-        image: file, 
-        imagePreview: previewUrl 
+      setForm(prev => ({
+        ...prev,
+        image: file,
+        imagePreview: previewUrl
       }));
     }
   };
@@ -115,12 +115,12 @@ export default function Events() {
         [`read("users")`, `write("user:${user.$id}")`]
       );
 
-      setForm({ 
-        title: "", 
+      setForm({
+        title: "",
         content: "",
         Date: "",
-        image: null, 
-        imagePreview: "" 
+        image: null,
+        imagePreview: ""
       });
       setShowModal(false);
       fetchEvents();
@@ -146,42 +146,85 @@ export default function Events() {
         </div>
       )}
 
-      <BentoGrid className="max-w-4xl mx-auto">
-        {displayedEvents.map((event, i) => (
-          <BentoGridItem
-            key={event.$id}
-            title={<div className="line-clamp-1 text-ellipsis overflow-hidden px-2 font-medium">{event.title}</div>}
-            description={null}
-            header={
-              <div 
-                onClick={() => setSelectedEvent(event)} 
-                className="cursor-pointer h-full overflow-hidden rounded-t-xl"
-              >
-                {event.ImageUrl ? (
-                  <img
-                    src={event.ImageUrl}
-                    alt={event.title}
-                    className="w-full h-full object-cover min-h-[10rem] hover:scale-105 transition-transform duration-300"
-                  />
+      {/* Wrap BentoGrid + popup together */}
+      <div className="relative">
+        <BentoGrid className="max-w-4xl mx-auto">
+          {displayedEvents.map((event, i) => (
+            <BentoGridItem
+              key={event.$id}
+              title={<div className="line-clamp-1 text-ellipsis overflow-hidden px-2 font-medium">{event.title}</div>}
+              description={null}
+              header={
+                <div
+                  onClick={() => setSelectedEvent(event)}
+                  className="cursor-pointer h-full overflow-hidden rounded-t-xl"
+                >
+                  {event.ImageUrl ? (
+                    <img
+                      src={event.ImageUrl}
+                      alt={event.title}
+                      className="w-full h-full object-cover min-h-[10rem] hover:scale-105 transition-transform duration-300"
+                    />
+                  ) : (
+                    <Skeleton />
+                  )}
+                </div>
+              }
+              icon={
+                i % 3 === 0 ? (
+                  <IconArrowWaveRightUp className="h-4 w-4 text-neutral-500" />
+                ) : i % 3 === 1 ? (
+                  <IconClipboardCopy className="h-4 w-4 text-neutral-500" />
                 ) : (
-                  <Skeleton />
-                )}
+                  <IconSignature className="h-4 w-4 text-neutral-500" />
+                )
+              }
+              className={`${i % 7 === 3 || i % 7 === 6 ? "md:col-span-2" : ""} cursor-pointer bg-white dark:bg-neutral-900 rounded-xl shadow-sm hover:shadow-md transition-shadow border border-neutral-100 dark:border-neutral-800`}
+              onClick={() => setSelectedEvent(event)}
+            />
+          ))}
+        </BentoGrid>
+
+        {selectedEvent && (
+          <div className="absolute inset-0 bg-black bg-opacity-80 z-50 flex items-center justify-center p-4">
+            <div
+              className="bg-white dark:bg-neutral-900 p-6 rounded-xl w-full max-w-md shadow-xl border border-neutral-200 dark:border-neutral-800"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex justify-between items-start mb-4">
+                <h2 className="text-2xl font-bold text-neutral-900 dark:text-white">{selectedEvent.title}</h2>
+                <button
+                  onClick={() => setSelectedEvent(null)}
+                  className="text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300 p-1"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
               </div>
-            }
-            icon={
-              i % 3 === 0 ? (
-                <IconArrowWaveRightUp className="h-4 w-4 text-neutral-500" />
-              ) : i % 3 === 1 ? (
-                <IconClipboardCopy className="h-4 w-4 text-neutral-500" />
-              ) : (
-                <IconSignature className="h-4 w-4 text-neutral-500" />
-              )
-            }
-            className={`${i % 7 === 3 || i % 7 === 6 ? "md:col-span-2" : ""} cursor-pointer bg-white dark:bg-neutral-900 rounded-xl shadow-sm hover:shadow-md transition-shadow border border-neutral-100 dark:border-neutral-800`}
-            onClick={() => setSelectedEvent(event)}
-          />
-        ))}
-      </BentoGrid>
+
+              {selectedEvent.ImageUrl && (
+                <img
+                  src={selectedEvent.ImageUrl}
+                  alt={selectedEvent.title}
+                  className="w-full h-48 object-cover rounded-lg mb-4"
+                />
+              )}
+
+              <div className="text-neutral-700 dark:text-neutral-300 space-y-4">
+                <p className="text-sm">{selectedEvent.content}</p>
+
+                <div className="border-t border-neutral-200 dark:border-neutral-800 pt-4">
+                  <div className="text-sm">
+                    <span className="text-neutral-500 dark:text-neutral-400 block">Date</span>
+                    <p className="font-medium">{selectedEvent.Date || "Not specified"}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
 
       {events.length > 8 && (
         <div className="flex justify-center mt-6">
@@ -191,49 +234,6 @@ export default function Events() {
           >
             {showAll ? "Show Less" : "Show More"}
           </button>
-        </div>
-      )}
-
-      {/* Event Detail Popup - Viewport Centered */}
-      {selectedEvent && (
-        <div className="fixed inset-0 bg-black bg-opacity-80 z-50 flex items-center justify-center p-4 overflow-y-auto">
-          <div 
-            className="bg-white dark:bg-neutral-900 p-6 rounded-xl w-full max-w-md shadow-xl border border-neutral-200 dark:border-neutral-800 my-auto"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="flex justify-between items-start mb-4">
-              <div>
-                <h2 className="text-2xl font-bold text-neutral-900 dark:text-white">{selectedEvent.title}</h2>
-              </div>
-              <button
-                onClick={() => setSelectedEvent(null)}
-                className="text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300 p-1"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
-            
-            {selectedEvent.ImageUrl && (
-              <img
-                src={selectedEvent.ImageUrl}
-                alt={selectedEvent.title}
-                className="w-full h-48 object-cover rounded-lg mb-4"
-              />
-            )}
-            
-            <div className="text-neutral-700 dark:text-neutral-300 space-y-4">
-              <p className="text-sm">{selectedEvent.content}</p>
-              
-              <div className="border-t border-neutral-200 dark:border-neutral-800 pt-4">
-                <div className="text-sm">
-                  <span className="text-neutral-500 dark:text-neutral-400 block">Date</span>
-                  <p className="font-medium">{selectedEvent.Date || "Not specified"}</p>
-                </div>
-              </div>
-            </div>
-          </div>
         </div>
       )}
 
@@ -250,23 +250,23 @@ export default function Events() {
                   placeholder="Event title"
                   value={form.title}
                   onChange={(e) => setForm({ ...form, title: e.target.value })}
-                  className="w-full p-2 border rounded"
+                  className="w-full p-2 border rounded bg-black text-white"
                   required
                 />
               </div>
-              
+
               <div>
                 <label className="block mb-1 text-sm font-medium">Content</label>
                 <textarea
                   placeholder="Event description"
                   value={form.content}
                   onChange={(e) => setForm({ ...form, content: e.target.value })}
-                  className="w-full p-2 border rounded"
+                  className="w-full p-2 border rounded bg-black text-white"
                   rows={4}
                   required
                 />
               </div>
-              
+
               <div>
                 <label className="block mb-1 text-sm font-medium">Date</label>
                 <input
@@ -274,10 +274,10 @@ export default function Events() {
                   placeholder="Event date"
                   value={form.Date}
                   onChange={(e) => setForm({ ...form, Date: e.target.value })}
-                  className="w-full p-2 border rounded"
+                  className="w-full p-2 border rounded bg-black text-white"
                 />
               </div>
-              
+
               <div>
                 <label className="block mb-1 text-sm font-medium">
                   Event Image (Optional)
@@ -298,7 +298,7 @@ export default function Events() {
                   </div>
                 )}
               </div>
-              
+
               <div className="flex justify-end space-x-2 pt-2">
                 <button
                   type="button"
