@@ -38,6 +38,8 @@ export default function Events() {
   const [user, setUser] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+  const [showAll, setShowAll] = useState(false); // New state for toggle
+  const [selectedEvent, setSelectedEvent] = useState(null); // For the popup
 
   const isAryan = user?.email === "aryan@gmail.com";
 
@@ -127,6 +129,9 @@ export default function Events() {
     }
   };
 
+  // Determine which events to display based on showAll state
+  const displayedEvents = showAll ? events : events.slice(0, 8);
+
   return (
     <div className="max-w-5xl mx-auto p-4">
       {isAryan && (
@@ -141,17 +146,18 @@ export default function Events() {
       )}
 
       <BentoGrid className="max-w-4xl mx-auto">
-        {events.map((event, i) => (
+        {displayedEvents.map((event, i) => (
           <BentoGridItem
             key={event.$id}
-            title={event.title}
-            description={event.content}
+            title={<div className="line-clamp-1 text-ellipsis overflow-hidden">{event.title}</div>}
+            description={null} // Remove description from initial view
             header={
               event.ImageUrl ? (
                 <img
                   src={event.ImageUrl}
                   alt={event.title}
-                  className="w-full h-full object-cover rounded-xl min-h-[10rem]"
+                  className="w-full h-full object-cover rounded-xl min-h-[10rem] cursor-pointer"
+                  onClick={() => setSelectedEvent(event)}
                 />
               ) : (
                 <Skeleton />
@@ -166,12 +172,56 @@ export default function Events() {
                 <IconSignature className="h-4 w-4 text-neutral-500" />
               )
             }
-            className={i % 7 === 3 || i % 7 === 6 ? "md:col-span-2" : ""}
+            className={`${i % 7 === 3 || i % 7 === 6 ? "md:col-span-2" : ""} cursor-pointer`}
+            onClick={() => setSelectedEvent(event)}
           />
         ))}
       </BentoGrid>
 
-      {/* Modal */}
+      {/* Show More/Show Less button - only show if there are more than 8 events */}
+      {events.length > 8 && (
+        <div className="flex justify-center mt-6">
+          <button
+            onClick={() => setShowAll(!showAll)}
+            className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-6 py-2 rounded-full shadow-md hover:scale-105 transition-transform"
+          >
+            {showAll ? "Show Less" : "Show More"}
+          </button>
+        </div>
+      )}
+
+      {/* Event Detail Modal */}
+      {selectedEvent && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 p-4">
+          <div className="bg-white dark:bg-zinc-900 p-6 rounded-lg w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-lg">
+            <div className="flex justify-between items-start mb-4">
+              <h2 className="text-2xl font-bold">{selectedEvent.title}</h2>
+              <button
+                onClick={() => setSelectedEvent(null)}
+                className="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            
+            {selectedEvent.ImageUrl && (
+              <img
+                src={selectedEvent.ImageUrl}
+                alt={selectedEvent.title}
+                className="w-full h-64 object-cover rounded-lg mb-4"
+              />
+            )}
+            
+            <div className="prose dark:prose-invert max-w-none">
+              {selectedEvent.content}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Add Event Modal */}
       {showModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
           <div className="bg-white dark:bg-zinc-900 p-6 rounded-lg w-full max-w-md shadow-lg">
