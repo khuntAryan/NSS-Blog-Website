@@ -36,14 +36,14 @@ export default function Post() {
     if (!post) {
         return (
             <div className="text-center py-20 text-white">
-                <p className="text-xl">Loading post...</p>
+                <p className="text-xl animate-pulse">Loading post...</p>
             </div>
         );
     }
 
     // Function to split and animate parsed HTML content
     const animateParsedContent = (html) => {
-        const lines = html.split(/<br\s*\/?>/i); // splitting by <br> tags
+        const lines = html.split(/<br\s*\/?>/i ); // splitting by <br> tags
         return lines.map((line, index) => (
             <motion.div
                 key={index}
@@ -57,20 +57,22 @@ export default function Post() {
     };
 
     return (
-        <div className="py-10 bg-gray-900 min-h-screen flex justify-center text-white">
+        <div className="py-10 bg-gradient-to-br from-gray-900 via-black to-gray-900 min-h-screen flex justify-center text-white relative overflow-hidden">
+            <div className="absolute -top-20 left-1/2 transform -translate-x-1/2 w-[160%] h-96 bg-gradient-to-tr from-orange-400/10 to-pink-400/5 rounded-full blur-3xl opacity-20 animate-spin-slow" />
+
             <Container>
-                <div className="max-w-4xl mx-auto rounded-xl bg-black p-6 text-sm font-mono leading-relaxed shadow-2xl border border-gray-700 relative">
+                <div className="max-w-4xl mx-auto rounded-3xl bg-black/80 p-8 text-sm font-mono leading-relaxed shadow-[0_4px_60px_rgba(255,255,255,0.05)] border border-gray-700 relative backdrop-blur-md">
 
                     {/* Terminal buttons top-left corner */}
-                    <div className="absolute top-4 left-4 flex space-x-2">
-                        <span className="w-3 h-3 bg-red-500 rounded-full" />
-                        <span className="w-3 h-3 bg-yellow-500 rounded-full" />
-                        <span className="w-3 h-3 bg-green-500 rounded-full" />
+                    <div className="absolute top-5 left-5 flex space-x-2">
+                        <span className="w-3 h-3 bg-red-500 rounded-full shadow-md" />
+                        <span className="w-3 h-3 bg-yellow-500 rounded-full shadow-md" />
+                        <span className="w-3 h-3 bg-green-500 rounded-full shadow-md" />
                     </div>
 
                     {/* Edit/Delete Buttons top-right */}
                     {isAuthor && (
-                        <div className="absolute top-4 right-4 flex gap-2">
+                        <div className="absolute top-5 right-5 flex gap-2">
                             <Link to={`/edit-post/${post.$id}`}>
                                 <Button bgColor="bg-green-600 hover:bg-green-700">Edit</Button>
                             </Link>
@@ -81,15 +83,13 @@ export default function Post() {
                     )}
 
                     {/* Terminal Content with Animation */}
-                    <div className="mt-10 space-y-4">
+                    <div className="mt-12 space-y-4 animate-fade-in-up">
                         <Terminal
-                            lines={[
-                                `Post Title: ${post.title}`,
-                            ]}
+                            lines={[`Post Title: ${post.title}`]}
                         />
 
                         {/* Animated Post Content */}
-                        <div className="pt-4 text-white space-y-2">
+                        <div className="pt-6 text-white space-y-4 text-[15px]">
                             {animateParsedContent(post.content)}
                         </div>
                     </div>

@@ -10,6 +10,8 @@ import { AuthLayout, Login } from './components/index.js'
 
 import AddPost from "./pages/AddPost";
 import Signup from './pages/Signup'
+import EditPost from './pages/EditPost.jsx'
+import Post from "./pages/Post";
 
 
 
@@ -56,6 +58,19 @@ const router = createBrowserRouter([
                     <AddPost />
                 </AuthLayout>
             ),
+        },
+        {
+            path: "/edit-post/:slug",
+            element: (
+                <AuthLayout authentication>
+                    {" "}
+                    <EditPost />
+                </AuthLayout>
+            ),
+        },
+        {
+            path: "/post/:slug",
+            element: <Post />,
         },
 
         
