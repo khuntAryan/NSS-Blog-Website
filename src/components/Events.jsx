@@ -241,10 +241,10 @@ export default function Events() {
       {showModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
           <div className="bg-white dark:bg-zinc-900 p-6 rounded-lg w-full max-w-md shadow-lg border border-neutral-200 dark:border-neutral-800">
-            <h2 className="text-xl font-semibold mb-4">Add New Event</h2>
+            <h2 className="text-xl font-semibold text-black mb-4">Add New Event</h2>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className="block mb-1 text-sm font-medium">Title</label>
+                <label className="block mb-1 text-sm text-black font-medium">Title</label>
                 <input
                   type="text"
                   placeholder="Event title"
@@ -256,7 +256,7 @@ export default function Events() {
               </div>
 
               <div>
-                <label className="block mb-1 text-sm font-medium">Content</label>
+                <label className="block mb-1 text-black text-sm font-medium">Content</label>
                 <textarea
                   placeholder="Event description"
                   value={form.content}
@@ -268,7 +268,7 @@ export default function Events() {
               </div>
 
               <div>
-                <label className="block mb-1 text-sm font-medium">Date</label>
+                <label className="block mb-1 text-sm text-black font-medium">Date</label>
                 <input
                   type="text"
                   placeholder="Event date"
@@ -279,7 +279,7 @@ export default function Events() {
               </div>
 
               <div>
-                <label className="block mb-1 text-sm font-medium">
+                <label className="block mb-1 text-black text-sm font-medium">
                   Event Image (Optional)
                 </label>
                 <input
@@ -303,7 +303,7 @@ export default function Events() {
                 <button
                   type="button"
                   onClick={() => setShowModal(false)}
-                  className="px-4 py-2 rounded border hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
+                  className="px-4 py-2 rounded border hover:bg-neutral-100 dark:hover:bg-neutral-800 text-black transition-colors"
                 >
                   Cancel
                 </button>
